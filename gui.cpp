@@ -1,21 +1,30 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 const int SHAPE_SPACING = 150;
 
 void open_window(std::vector<int>& clientSockets) {
     sf::RenderWindow window(sf::VideoMode(800, 500), "SFML Shapes Window");
 
-    // Load the background texture
     sf::Texture backgroundTexture;
     if (!backgroundTexture.loadFromFile("img/runner_background.jpg")) {
         std::cerr << "Error loading background texture." << std::endl;
         exit(1);
     }
 
+    sf::Texture persoTexture;
+    if (!persoTexture.loadFromFile("img/running_mario.png")) {
+        std::cerr << "Error loading perso texture." << std::endl;
+        exit(1);
+    }
+
     // Create a sprite to hold the background texture
     sf::Sprite backgroundSprite(backgroundTexture);
+
+    // Create a vector to hold the client sprites
+    std::vector<sf::Sprite> clientSprites;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -35,18 +44,29 @@ void open_window(std::vector<int>& clientSockets) {
         // Draw the background
         window.draw(backgroundSprite);
 
-        int numShapes = clientSockets.size();
+        // Update the number of client sprites based on the number of clients
+        while (clientSprites.size() < clientSockets.size()) {
+            sf::Sprite clientSprite(persoTexture);
+            clientSprites.push_back(clientSprite);
+        }
 
-        for (int i = 0; i < numShapes; i++) {
+        // Find the disconnected clients' sprites and remove them
+        for (auto it = clientSprites.begin(); it != clientSprites.end();) {
+            if (std::distance(clientSprites.begin(), it) >= clientSockets.size()) {
+                it = clientSprites.erase(it);
+            } else {
+                ++it;
+            }
+        }
+
+        // Set the positions and draw the client sprites
+        for (std::size_t i = 0; i < clientSprites.size(); ++i) {
             float x = 100.0f + i * SHAPE_SPACING;
             float y = 300.0f;
-            sf::CircleShape circle(50);
-            circle.setFillColor(sf::Color::Red);
-            circle.setPosition(x, y);
-            window.draw(circle);
+            clientSprites[i].setPosition(x, y);
+            window.draw(clientSprites[i]);
         }
 
         window.display();
     }
 }
-
