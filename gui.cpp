@@ -10,7 +10,7 @@ const int NUM_FRAMES = 11; // The number of frames in the animation
 const float ANIMATION_FRAME_TIME = 0.1f; // Time in seconds for each animation frame
 
 void open_window(std::vector<int>& clientSockets) {
-    sf::RenderWindow window(sf::VideoMode(800, 500), "My advanced runner");
+    sf::RenderWindow window(sf::VideoMode(1920, 1080), "My advanced runner");
 
     sf::Texture backgroundTexture;
     if (!backgroundTexture.loadFromFile("img/runner_background.jpg")) {
